@@ -615,75 +615,75 @@ static struct sgm41513_platform_data *sgm41513_parse_dt(struct device_node *np,
     }
 
     sgm->chg_det_enable =
-        of_property_read_bool(np, "sgm41513,charge-detect-enable");
+        of_property_read_bool(np, "sgm,sgm41513,charge-detect-enable");
 
-    ret = of_property_read_u32(np, "sgm41513,usb-vlim", &pdata->usb.vlim);
+    ret = of_property_read_u32(np, "sgm,sgm41513,usb-vlim", &pdata->usb.vlim);
     if (ret) {
         pdata->usb.vlim = 4500;
-        pr_err("Failed to read node of sgm41513,usb-vlim\n");
+        pr_err("Failed to read node of sgm,sgm41513,usb-vlim\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,usb-ilim", &pdata->usb.ilim);
+    ret = of_property_read_u32(np, "sgm,sgm41513,usb-ilim", &pdata->usb.ilim);
     if (ret) {
         pdata->usb.ilim = 2000;
-        pr_err("Failed to read node of sgm41513,usb-ilim\n");
+        pr_err("Failed to read node of sgm,sgm41513,usb-ilim\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,usb-vreg", &pdata->usb.vreg);
+    ret = of_property_read_u32(np, "sgm,sgm41513,usb-vreg", &pdata->usb.vreg);
     if (ret) {
         pdata->usb.vreg = 4200;
-        pr_err("Failed to read node of sgm41513,usb-vreg\n");
+        pr_err("Failed to read node of sgm,sgm41513,usb-vreg\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,usb-ichg", &pdata->usb.ichg);
+    ret = of_property_read_u32(np, "sgm,sgm41513,usb-ichg", &pdata->usb.ichg);
     if (ret) {
         pdata->usb.ichg = 2000;
-        pr_err("Failed to read node of sgm41513,usb-ichg\n");
+        pr_err("Failed to read node of sgm,sgm41513,usb-ichg\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,stat-pin-ctrl",
+    ret = of_property_read_u32(np, "sgm,sgm41513,stat-pin-ctrl",
                     &pdata->statctrl);
     if (ret) {
         pdata->statctrl = 0;
-        pr_err("Failed to read node of sgm41513,stat-pin-ctrl\n");
+        pr_err("Failed to read node of sgm,sgm41513,stat-pin-ctrl\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,precharge-current",
+    ret = of_property_read_u32(np, "sgm,sgm41513,precharge-current",
                     &pdata->iprechg);
     if (ret) {
         pdata->iprechg = 180;
-        pr_err("Failed to read node of sgm41513,precharge-current\n");
+        pr_err("Failed to read node of sgm,sgm41513,precharge-current\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,termination-current",
+    ret = of_property_read_u32(np, "sgm,sgm41513,termination-current",
                     &pdata->iterm);
     if (ret) {
         pdata->iterm = 180;
         pr_err
-            ("Failed to read node of sgm41513,termination-current\n");
+            ("Failed to read node of sgm,sgm41513,termination-current\n");
     }
 
     ret =
-        of_property_read_u32(np, "sgm41513,boost-voltage",
+        of_property_read_u32(np, "sgm,sgm41513,boost-voltage",
                  &pdata->boostv);
     if (ret) {
         pdata->boostv = 5000;
-        pr_err("Failed to read node of sgm41513,boost-voltage\n");
+        pr_err("Failed to read node of sgm,sgm41513,boost-voltage\n");
     }
 
     ret =
-        of_property_read_u32(np, "sgm41513,boost-current",
+        of_property_read_u32(np, "sgm,sgm41513,boost-current",
                  &pdata->boosti);
     if (ret) {
         pdata->boosti = 1200;
-        pr_err("Failed to read node of sgm41513,boost-current\n");
+        pr_err("Failed to read node of sgm,sgm41513,boost-current\n");
     }
 
-    ret = of_property_read_u32(np, "sgm41513,vac-ovp-threshold",
+    ret = of_property_read_u32(np, "sgm,sgm41513,vac-ovp-threshold",
                     &pdata->vac_ovp);
     if (ret) {
         pdata->vac_ovp = 6500;
-        pr_err("Failed to read node of sgm41513,vac-ovp-threshold\n");
+        pr_err("Failed to read node of sgm,sgm41513,vac-ovp-threshold\n");
     }
 
     return pdata;
