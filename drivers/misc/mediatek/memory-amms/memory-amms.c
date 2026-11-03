@@ -59,6 +59,7 @@
 #define AMMS_PENDING_DRDI_FREE_BIT (1<<0)
 
 static struct task_struct *amms_task;
+static bool amms_event_pending;
 bool amms_static_free;
 static const struct of_device_id amms_of_ids[] = {
 	{ .compatible = "mediatek,amms", },
@@ -123,6 +124,7 @@ static irqreturn_t amms_irq_handler(int irq, void *dev_id)
 	trace_amms_event_receive_irq(amms_seq_id);
 	if (amms_task) {
 		disable_irq_nosync(irq);
+		WRITE_ONCE(amms_event_pending, true);
 		wake_up_process(amms_task);
 	} else
 		pr_info("%s:amms_task is null\n", __func__);
@@ -244,12 +246,23 @@ void amms_handle_event(void)
 static int amms_task_process(void *p)
 {
 	while (1) {
-		amms_handle_event();
+		/*
+		 * Sleep interruptibly until the IRQ handler reports an event.
+		 * A thread that is created but never woken stays in
+		 * TASK_UNINTERRUPTIBLE and adds one to the load average.
+		 */
 		set_current_state(TASK_INTERRUPTIBLE);
-		enable_irq(amms_irq_num);
-		schedule();
+		if (!READ_ONCE(amms_event_pending) && !kthread_should_stop())
+			schedule();
+		__set_current_state(TASK_RUNNING);
 		if (kthread_should_stop())
 			do_exit(0);
+		if (!READ_ONCE(amms_event_pending))
+			continue;
+		/* the IRQ stays disabled until enable_irq() below */
+		WRITE_ONCE(amms_event_pending, false);
+		amms_handle_event();
+		enable_irq(amms_irq_num);
 	}
 	return 0;
 }
@@ -284,6 +297,7 @@ static int __init amms_probe(struct platform_device *pdev)
 	}
 
 	sched_setscheduler(amms_task, SCHED_FIFO, &param);
+	wake_up_process(amms_task);
 
 	if (request_irq(amms_irq_num, (irq_handler_t)amms_irq_handler,
 		IRQF_TRIGGER_NONE, "amms_irq", NULL) != 0) {
