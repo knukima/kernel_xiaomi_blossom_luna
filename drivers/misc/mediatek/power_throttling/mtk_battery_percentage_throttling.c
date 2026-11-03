@@ -7,6 +7,7 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/kthread.h>
+#include <linux/workqueue.h>
 #include <linux/device.h>
 #include <linux/power_supply.h>
 #include <mtk_battery_percentage_throttling.h>
@@ -112,25 +113,30 @@ int bat_percent_notify_handler(void *unused)
 	return 0;
 }
 
-int bp_psy_event(struct notifier_block *nb, unsigned long event, void *v)
+/*
+ * Reading the battery properties may sleep, while power supply notifiers
+ * run in an atomic notifier chain, so the check runs from a work item.
+ */
+static void bp_psy_work_func(struct work_struct *work)
 {
-	struct power_supply *psy = v;
+	struct power_supply *psy;
 	union power_supply_propval val;
 	int ret = 0;
 	int uisoc = -1, bat_status = -1;
 
-	if (strcmp(psy->desc->name, "battery") != 0)
-		return NOTIFY_DONE;
+	psy = power_supply_get_by_name("battery");
+	if (!psy)
+		return;
 
 	ret = power_supply_get_property(psy, POWER_SUPPLY_PROP_CAPACITY, &val);
 	if (ret)
-		return NOTIFY_DONE;
+		goto out;
 
 	uisoc = val.intval;
 
 	ret = power_supply_get_property(psy, POWER_SUPPLY_PROP_STATUS, &val);
 	if (ret)
-		return NOTIFY_DONE;
+		goto out;
 
 	bat_status = val.intval;
 
@@ -152,6 +158,18 @@ int bp_psy_event(struct notifier_block *nb, unsigned long event, void *v)
 		pr_info("bat_percent_notify called, l=%d s=%d soc=%d\n",
 			g_battery_percent_level, bat_status, uisoc);
 	}
+out:
+	power_supply_put(psy);
+}
+
+static DECLARE_WORK(bp_psy_work, bp_psy_work_func);
+
+int bp_psy_event(struct notifier_block *nb, unsigned long event, void *v)
+{
+	struct power_supply *psy = v;
+
+	if (strcmp(psy->desc->name, "battery") == 0)
+		schedule_work(&bp_psy_work);
 
 	return NOTIFY_DONE;
 }
