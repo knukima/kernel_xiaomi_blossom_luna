@@ -154,7 +154,7 @@ int Ripi_cpu_dvfs_thread(void *data)
 		tag_pr_notice
 		("Error: ipi_recv_registration CPU DVFS error: %d\n", ret);
 		do {
-			msleep(1000);
+			schedule_timeout_idle(HZ);
 		} while (!kthread_should_stop());
 		return (-1);
 	}

@@ -535,7 +535,7 @@ void debug_print_power_mode_check(enum mtkfb_power_mode prev,
  * NOTES: primary_path_lock should NOT be held when call this func !!!!!!!!
  */
 #define __primary_display_wait_state(condition, timeout) \
-	wait_event_timeout(display_state_wait_queue, condition, timeout)
+	wait_event_idle_timeout(display_state_wait_queue, condition, timeout)
 
 long primary_display_wait_state(enum DISP_POWER_STATE state, long timeout)
 {
@@ -5475,7 +5475,7 @@ static int decouple_trigger_worker_thread(void *data)
 	sched_setscheduler(current, SCHED_RR, &param);
 
 	while (1) {
-		wait_event(decouple_trigger_wq,
+		wait_event_idle(decouple_trigger_wq,
 			atomic_read(&decouple_trigger_event));
 		dpmgr_wait_event(pgc->dpmgr_handle, DISP_PATH_EVENT_IF_VSYNC);
 

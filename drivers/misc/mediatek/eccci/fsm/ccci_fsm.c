@@ -520,7 +520,7 @@ static int fsm_main_thread(void *data)
 	unsigned long flags;
 
 	while (1) {
-		wait_event(ctl->command_wq,
+		wait_event_idle(ctl->command_wq,
 			!list_empty(&ctl->command_queue));
 		spin_lock_irqsave(&ctl->command_lock, flags);
 		cmd = list_first_entry(&ctl->command_queue,

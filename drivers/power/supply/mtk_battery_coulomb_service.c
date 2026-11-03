@@ -418,7 +418,7 @@ static int gauge_coulomb_thread(void *arg)
 		fix_coverity = 1;
 
 	while (1) {
-		wait_event(cs->wait_que, (cs->coulomb_thread_timeout == true));
+		wait_event_idle(cs->wait_que, (cs->coulomb_thread_timeout == true));
 		cs->coulomb_thread_timeout = false;
 		get_monotonic_boottime(&start);
 

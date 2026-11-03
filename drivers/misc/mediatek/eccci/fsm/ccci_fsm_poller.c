@@ -127,7 +127,7 @@ static int fsm_poll_main(void *data)
 			}
 		}
 next:
-		msleep(POLLING_INTERVAL_TIME);
+		schedule_timeout_idle(msecs_to_jiffies(POLLING_INTERVAL_TIME));
 	}
 	return 0;
 }

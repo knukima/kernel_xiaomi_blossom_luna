@@ -1560,7 +1560,7 @@ static int charger_routine_thread(void *arg)
 	bool is_charger_on;
 
 	while (1) {
-		wait_event(info->wait_que,
+		wait_event_idle(info->wait_que,
 			(info->charger_thread_timeout == true));
 
 		while (is_module_init_done == false) {
