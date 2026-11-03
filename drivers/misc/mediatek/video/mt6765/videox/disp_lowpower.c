@@ -120,9 +120,6 @@ static struct disp_idlemgr_context *_get_idlemgr_context(void)
 	g_idlemgr_context.enterulps = 0;
 	g_idlemgr_context.idlemgr_last_kick_time = ~(0ULL);
 	g_idlemgr_context.cur_lp_cust_mode = 0;
-	g_idlemgr_context.primary_display_idlemgr_task
-		= kthread_create(_primary_path_idlemgr_monitor_thread, NULL,
-		"disp_idlemgr");
 #if defined(CONFIG_MTK_DUAL_DISPLAY_SUPPORT) && \
 (CONFIG_MTK_DUAL_DISPLAY_SUPPORT == 2)
 	init_waitqueue_head(&(g_idlemgr_context.ext_idlemgr_wait_queue));
@@ -139,7 +136,9 @@ static struct disp_idlemgr_context *_get_idlemgr_context(void)
 
 int primary_display_idlemgr_init(void)
 {
-	wake_up_process(idlemgr_pgc->primary_display_idlemgr_task);
+	idlemgr_pgc->primary_display_idlemgr_task =
+		kthread_run(_primary_path_idlemgr_monitor_thread, NULL,
+		"disp_idlemgr");
 	return 0;
 }
 
