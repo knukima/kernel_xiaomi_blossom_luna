@@ -7995,10 +7995,17 @@ int _set_backlight_by_cpu(unsigned int level)
 	return ret;
 }
 
+/* Last level sent to the panel, UINT_MAX until the first one */
+static unsigned int primary_bl_level = UINT_MAX;
+#ifdef CONFIG_BACKLIGHT_SUPPORT_2047_FEATURE
+#define PRIMARY_BL_DEFAULT_LEVEL 1024
+#else
+#define PRIMARY_BL_DEFAULT_LEVEL 128
+#endif
+
 int primary_display_setbacklight(unsigned int level)
 {
 	int ret = 0;
-	static unsigned int last_level;
 	bool aal_is_support = disp_aal_is_support();
 
 	DISPFUNC();
@@ -8008,7 +8015,7 @@ int primary_display_setbacklight(unsigned int level)
 		return 0;
 	}
 
-	if (last_level == level)
+	if (primary_bl_level == level)
 		return 0;
 
 	mmprofile_log_ex(ddp_mmp_get_events()->primary_set_bl,
@@ -8037,7 +8044,7 @@ int primary_display_setbacklight(unsigned int level)
 		} else {
 			_set_backlight_by_cpu(level);
 		}
-		last_level = level;
+		primary_bl_level = level;
 	}
 
 	if (aal_is_support == false) {
@@ -8049,6 +8056,22 @@ int primary_display_setbacklight(unsigned int level)
 	mmprofile_log_ex(ddp_mmp_get_events()->primary_set_bl,
 		MMPROFILE_FLAG_END, 0, 0);
 	return ret;
+}
+
+/*
+ * The panel init sequence that runs on resume sets the brightness to 0.
+ * Android sets the brightness again after every screen on, but nothing
+ * does that for fbdev users, so send the last level to the panel again.
+ */
+void primary_display_restore_backlight(void)
+{
+	unsigned int level = primary_bl_level;
+
+	if (level == UINT_MAX)
+		level = PRIMARY_BL_DEFAULT_LEVEL;
+	/* the panel is at 0 now, so do not skip the same level */
+	primary_bl_level = UINT_MAX;
+	primary_display_setbacklight(level);
 }
 
 int _set_lcm_cmd_by_cmdq(unsigned int *lcm_cmd, unsigned int *lcm_count,
