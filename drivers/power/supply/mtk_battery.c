@@ -243,6 +243,36 @@ static enum power_supply_property battery_props[] = {
 	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
 };
 
+static int interpolate_soc(struct fuelgauge_profile_struct *profile, int size, int ocv)
+{
+	int i;
+	if (size <= 0 || !profile)
+		return 50;
+	if (ocv >= profile[0].voltage)
+		return 100;
+	if (ocv <= profile[size-1].voltage)
+		return 0;
+
+	for (i = 0; i < size - 1; i++) {
+		if (profile[i].voltage > ocv && ocv >= profile[i+1].voltage) {
+			int v1 = profile[i].voltage;
+			int v2 = profile[i+1].voltage;
+			int d1 = profile[i].mah;
+			int d2 = profile[i+1].mah;
+			long long dod;
+			int max_dod = profile[size-1].mah;
+			if (v2 - v1 == 0)
+				continue;
+			if (max_dod <= 0)
+				max_dod = 10000;
+			
+			dod = ((long long)(d2 - d1) * (ocv - v1)) / (v2 - v1) + d1;
+			return (int)(((long long)(max_dod - dod) * 100) / max_dod);
+		}
+	}
+	return 50;
+}
+
 static int battery_psy_get_property(struct power_supply *psy,
 	enum power_supply_property psp,
 	union power_supply_propval *val)
@@ -284,10 +314,52 @@ static int battery_psy_get_property(struct power_supply *psy,
 			break;
 		}
 
-		if (gm->fixed_uisoc != 0xffff)
+		if (gm->fixed_uisoc != 0xffff) {
 			val->intval = gm->fixed_uisoc;
-		else
-			val->intval = bs_data->bat_capacity;
+		} else {
+			int cap = bs_data->bat_capacity;
+			int vbat = gauge_get_int_property(GAUGE_PROP_BATTERY_VOLTAGE);
+			int raw_soc = -1;
+			if (vbat > 10000)
+				vbat /= 1000;
+			if (vbat > 0) {
+				struct fuelgauge_profile_struct *profile_p;
+				int size;
+				extern struct fuelgauge_profile_struct *fg_get_profile(struct mtk_battery *gm, int temperature);
+				extern int fg_get_saddles(struct mtk_battery *gm);
+
+				profile_p = fg_get_profile(gm, 25);
+				if (!profile_p) {
+					int idx = gm->fg_table_cust_data.active_table_number / 2;
+					if (idx >= 0 && idx < gm->fg_table_cust_data.active_table_number) {
+						profile_p = &gm->fg_table_cust_data.fg_profile[idx].fg_profile[0];
+					}
+				}
+				if (profile_p) {
+					memcpy(&gm->fg_table_cust_data.fg_profile_temperature_1[0],
+						profile_p,
+						sizeof(gm->fg_table_cust_data.fg_profile_temperature_1));
+				}
+
+				size = fg_get_saddles(gm);
+				if (profile_p && size > 0) {
+					raw_soc = interpolate_soc(profile_p, size, vbat * 10);
+					pr_info("MTK_BATTERY_DEBUG: size=%d, tb1=%d, p0_vol=%d, p1_vol=%d, plast_vol=%d, target_ocv=%d, raw_soc=%d\n",
+						size, gm->fg_table_cust_data.temperature_tb1,
+						profile_p[0].voltage, profile_p[1].voltage, profile_p[size-1].voltage, vbat * 10, raw_soc);
+				} else {
+					pr_info("MTK_BATTERY_DEBUG: profile_p is NULL or size=0!\n");
+				}
+			}
+			pr_info("MTK_BATTERY: cap=%d ui_soc=%d vbat=%d raw_soc=%d active=%d\n",
+				cap, gm->ui_soc, vbat, raw_soc, gm->algo.active);
+			if (cap < 0 || cap > 100) {
+				cap = raw_soc;
+				if (cap < 0 || cap > 100)
+					cap = 50;
+			}
+			val->intval = cap;
+		}
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_NOW:
 		val->intval =
@@ -2920,7 +2992,7 @@ static int power_misc_routine_thread(void *arg)
 	struct shutdown_controller *sdd = &gm->sdc;
 
 	while (1) {
-		wait_event(sdd->wait_que, (sdd->timeout == true)
+		wait_event_idle(sdd->wait_que, (sdd->timeout == true)
 			|| (sdd->overheat == true));
 		if (sdd->timeout == true) {
 			sdd->timeout = false;

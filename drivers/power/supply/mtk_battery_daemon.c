@@ -30,9 +30,6 @@ static int interpolation(int i1, int b1, int i2, int b2, int i)
 	return ret;
 }
 
-/* ============================================================ */
-/* Customized function */
-/* ============================================================ */
 int get_customized_aging_factor(int orig_af)
 {
 	return (orig_af + 100);
@@ -4465,7 +4462,7 @@ static int mtk_battery_resume(struct mtk_battery *gm)
 
 bool is_daemon_support(struct mtk_battery *gm)
 {
-	bool is_support = true;
+	bool is_support = false;
 
 	pr_notice("%s: is_support = %d\n", __func__, is_support);
 	return is_support;
