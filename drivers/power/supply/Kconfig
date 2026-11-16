@@ -647,14 +647,13 @@ config CHARGER_CROS_USBPD
 	  that into power_supply properties.
 
 config MTK_BATTERY
-	bool "MTK BATTERY framework and algorithm"
+	bool "MediaTek battery framework and algorithm"
 	depends on MFD_MT6397
 	default n
 	help
-	  Say Y to enable support for MTK battery Algorithm.
-	  It is fuel gauge algorithm , The driver get various
-	  battery information from hardware to calculate
-	  Battery percentage.
+	  Say Y here to enable support for the MediaTek battery fuel gauge
+	  algorithm. The driver gets various battery information from the
+	  hardware and uses it to calculate the battery percentage.
 
 config BATTERY_MT6357
 	tristate "MT6357 fuel gauge support"
@@ -662,10 +661,10 @@ config BATTERY_MT6357
 	depends on NET
 	default m
 	help
-	  Say Y to enable support for MT6357 battery driver.
-	  it measure battery current and temperature to provide
-	  battery information , It issues interrupt when trigger
-	  threshold is met.
+	  Say Y here to enable support for the MT6357 battery driver.
+	  It measures battery current and temperature to provide battery
+	  information, and issues an interrupt when a trigger threshold
+	  is met.
 
 config BATTERY_MT6359
 	tristate "MT6359 fuel gauge support"
@@ -673,166 +672,157 @@ config BATTERY_MT6359
 	depends on NET
 	default m
 	help
-	  Say Y to enable support for MT6359 battery driver.
-	  it measure battery current and temperature to provide
-	  battery information , It issues interrupt when trigger
-	  threshold is met.
+	  Say Y here to enable support for the MT6359 battery driver.
+	  It measures battery current and temperature to provide battery
+	  information, and issues an interrupt when a trigger threshold
+	  is met.
 
 config CHARGER_MT6360
-	tristate "Mediatek MT6360 Charger Driver"
+	tristate "MediaTek MT6360 charger driver"
 	depends on MFD_MT6360
 	depends on REGULATOR
 	select EXTCON
 	help
-	  Say Y here to enable MT6360 Charger Part.
-	  support High-Accuracy Voltage/Current Regulation,
-	  Average Input Current Regulation, Battery Tempature Sensing,
-	  Over-Temperature Protection, DPDM Detection for BC1.2
+	  Say Y here to enable support for the charger part of the MT6360.
+	  It supports high-accuracy voltage/current regulation, average
+	  input current regulation, battery temperature sensing,
+	  over-temperature protection and DPDM detection for BC1.2.
 
 config CHARGER_TYPE_MT6357
-	tristate "MT6357 Charger Type Detection Driver"
+	tristate "MT6357 charger type detection driver"
 	depends on MFD_MT6397
 	help
-	  Say yes here to enable MT6357 Charger Type
-	  Detection Driver.
-	  This driver use MT6357 to detect charger type
-	  Say no if not using MT6357 Charger Type Detection.
+	  Say Y here to enable the MT6357 charger type detection driver.
+	  It uses the MT6357 to detect the type of the connected charger.
+
+	  If unsure, say N.
 
 config CHARGER_MT6357
-	bool "MT6357 Pulse Charger Driver"
+	bool "MT6357 pulse charger driver"
 	depends on MFD_MT6397
 	help
-	  Say yes here to enable MT6357 Pulse Charger
-	  Detection Driver.
-	  This driver use MT6357 to charge
-	  Say no if not using MT6357 to charge
+	  Say Y here to enable the MT6357 pulse charger driver.
+	  It uses the MT6357 to charge the battery.
+
+	  If unsure, say N.
 
 config MTK_CHARGER
-	bool "MediaTek Charging Driver"
+	bool "MediaTek charging driver"
 	help
-	  Say yes here to enable MediaTek charging driver.
-	  This driver contains charging control flow and
-	  maintains charging status.
-	  Say no if not using MediaTek charging driver.
+	  Say Y here to enable the MediaTek charging driver. It contains
+	  the charging control flow and maintains the charging status.
+
+	  If unsure, say N.
 
 config MTK_KERNEL_POWER_OFF_CHARGING
-	bool "MTK kernel power off charging"
+	bool "MediaTek kernel power off charging"
 	depends on MTK_CHARGER
 	help
-	  yes : support KPOC feature, power off charging would running by
-	  kernel and charging animation by kpoc service. no: not support KPOC
-	  feature.
-	  device won't enter charging mode if config is no.
+	  Say Y here to enable kernel power off charging (KPOC). Power off
+	  charging is then run by the kernel and the charging animation is
+	  shown by the kpoc service.
+
+	  If you say N, the device will not enter charging mode while
+	  powered off.
 
 config MTK_PUMP_EXPRESS_PLUS_SUPPORT
-	bool "MediaTek PUMP EXPRESS PLUS"
+	bool "MediaTek Pump Express Plus"
 	depends on MTK_CHARGER
 	help
-	  Fast charging technology using switch charger and current pattern
-	  to achive better charging ability.
-	  Set Yes to enable PE+
-	  Set No to disable PE+
+	  Say Y here to enable Pump Express Plus (PE+). It is a fast
+	  charging technology which uses a switch charger and a current
+	  pattern to achieve a better charging ability.
+
+	  If unsure, say N.
 
 config MTK_PUMP_EXPRESS_PLUS_20_SUPPORT
-	bool "MediaTek PUMP EXPRESS PLUS 2.0"
+	bool "MediaTek Pump Express Plus 2.0"
 	depends on MTK_CHARGER
 	help
-	  Fast charging technology using switch charger and current pattern
-	  to achive better charging ability. It has higher charging efficiency
-	  and has better thermal performance than PE+.
-	  Set Yes to enable PE+2.0
-	  Set No to disable PE+2.0
+	  Say Y here to enable Pump Express Plus 2.0 (PE+ 2.0). It is a
+	  fast charging technology which uses a switch charger and a
+	  current pattern to achieve a better charging ability. It has a
+	  higher charging efficiency and better thermal performance than
+	  PE+.
+
+	  If unsure, say N.
 
 config MTK_PUMP_EXPRESS_40_SUPPORT
-	bool "MediaTek PUMP EXPRESS 4.0"
+	bool "MediaTek Pump Express 4.0"
 	depends on MTK_CHARGER
 	help
-	  Fast charging technology using switch charger and current pattern
-	  to achive better charging ability. It has higher charging efficiency
-	  and has better thermal performance than PE+.
-	  Set Yes to enable PE 4.0
-	  Set No to disable PE 4.0
+	  Say Y here to enable Pump Express 4.0 (PE 4.0). It is a fast
+	  charging technology which uses a switch charger and a current
+	  pattern to achieve a better charging ability. It has a higher
+	  charging efficiency and better thermal performance than PE+.
 
+	  If unsure, say N.
 
 config CHARGER_RT9458
-	bool "Charger Driver for Richtek RT9458 Charger IC"
+	bool "Richtek RT9458 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable
-	  Richtek RT9458 driver.
-	  It depends on
-	  the config MTK_CHARGER.
+	  Say Y here to enable support for the Richtek RT9458 battery
+	  charger.
 
 config CHARGER_RT9465
-	bool "Charger Driver for Richtek RT9465 Charger IC"
+	bool "Richtek RT9465 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable Richtek RT9465 driver.
-	  It is mainly used as slave IC for dual charger
-	  application.
-	  It depends on config MTK_CHARGER.
+	  Say Y here to enable support for the Richtek RT9465 battery
+	  charger. It is mainly used as a slave IC in dual charger
+	  applications.
 
 config CHARGER_RT9466
-	bool "Charger Driver for Richtek RT9466 Charger IC"
+	bool "Richtek RT9466 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable Richtek RT9466 driver.
-	  It is mainly used as slave IC for dual charger
-	  application.
-	  It depends on config MTK_CHARGER.
+	  Say Y here to enable support for the Richtek RT9466 battery
+	  charger. It is mainly used as a slave IC in dual charger
+	  applications.
 
 config CHARGER_RT9467
-	bool "Charger Driver for Richtek RT9467 Charger IC"
+	bool "Richtek RT9467 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable Richtek RT9467 driver.
-	  It is mainly used as slave IC for dual charger
-	  application.
-	  It depends on config MTK_CHARGER.
+	  Say Y here to enable support for the Richtek RT9467 battery
+	  charger. It is mainly used as a slave IC in dual charger
+	  applications.
 
 config CHARGER_RT9471
-	bool "Charger Driver for Richtek RT9471 Charger IC"
+	bool "Richtek RT9470/RT9471 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable Richtek RT9471 driver.
-	  It supports RT9470/RT9470D/RT9471/RT9471D,
-	  which RT9470D and RT9471D support BC1.2
-	  It depends on config MTK_CHARGER.
+	  Say Y here to enable support for the Richtek RT9470, RT9470D,
+	  RT9471 and RT9471D battery chargers. The RT9470D and RT9471D
+	  also support BC1.2.
 
 config CHARGER_BQ25601
-	bool "CHARGER_BQ25601"
+	bool "TI BQ25601 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable
-	  TI BQ25601 driver.
-	  It depends on
-	  the config MTK_CHARGER.
+	  Say Y here to enable support for the TI BQ25601 battery charger.
 
 config CHARGER_BQ2560X
-    bool "CHARGER_BQ2560X"
+	bool "TI BQ2560x charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable
-	  TI BQ25601 driver.
-	  It depends on
-	  the config MTK_CHARGER.
+	  Say Y here to enable support for the TI BQ2560x battery
+	  chargers.
 
 config CHARGER_SGM41513
-	bool "CHARGER_SGM41513"
+	bool "SGMICRO SGM41513 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable
-	  SGM SGM41513 battery charger driver.
-	  It depends on
-	  the config MTK_CHARGER.
+	  Say Y here to enable support for the SGMICRO SGM41513 battery
+	  charger.
 
 config CHARGER_CX7601
-    bool "CHARGER_CX7601"
+	bool "SUNCORE CX7601 charger driver"
 	depends on MTK_CHARGER
 	help
-	  Say Yes to enable
-	  SUNCORE CX7601 driver.
-	  It depends on
-	  the config MTK_CHARGER.
+	  Say Y here to enable support for the SUNCORE CX7601 battery
+	  charger.
 
 endif # POWER_SUPPLY
+
