@@ -37,6 +37,10 @@
 
 #include <asm/fb.h>
 
+int fbcon_modechange_possible(struct fb_info *info, struct fb_var_screeninfo *var)
+{
+    return 0;
+}
 
     /*
      *  Frame buffer device initialization and setup routines
