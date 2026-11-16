@@ -912,7 +912,7 @@ static int mtkfb_soft_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	NOT_REFERENCED(info);
 	NOT_REFERENCED(cursor);
 
-	return 0;
+	return -EINVAL;
 }
 
 static int mtkfb_get_overlay_layer_info(
@@ -1755,22 +1755,23 @@ static int mtkfb_pan_display_proxy(struct fb_var_screeninfo *var,
 /* Callback table for the frame buffer framework. Some of these pointers
  * will be changed according to the current setting of fb_info->accel_flags.
  */
+
 static struct fb_ops mtkfb_ops = {
-	.owner = THIS_MODULE,
-	.fb_open = mtkfb_open,
-	.fb_release = mtkfb_release,
-	.fb_pan_display = mtkfb_pan_display_proxy,
-	.fb_fillrect = cfb_fillrect,
-	.fb_copyarea = cfb_copyarea,
-	.fb_imageblit = cfb_imageblit,
-	.fb_cursor = mtkfb_soft_cursor,
-	.fb_check_var = mtkfb_check_var,
-	.fb_set_par = mtkfb_set_par,
-	.fb_ioctl = mtkfb_ioctl,
+    .owner = THIS_MODULE,
+    .fb_open = mtkfb_open,
+    .fb_release = mtkfb_release,
+    .fb_pan_display = mtkfb_pan_display_proxy,
+    .fb_fillrect = cfb_fillrect,
+    .fb_copyarea = cfb_copyarea,
+    .fb_imageblit = cfb_imageblit,
+    .fb_cursor = mtkfb_soft_cursor,
+    .fb_check_var = mtkfb_check_var,
+    .fb_set_par = mtkfb_set_par,
+    .fb_ioctl = mtkfb_ioctl,
 #ifdef CONFIG_COMPAT
-	.fb_compat_ioctl = mtkfb_compat_ioctl,
+    .fb_compat_ioctl = mtkfb_compat_ioctl,
 #endif
-	.fb_blank = mtkfb_blank,
+    .fb_blank = mtkfb_blank,
 };
 
 #if defined(CONFIG_MTK_DUAL_DISPLAY_SUPPORT) && \
@@ -1887,6 +1888,25 @@ static int mtkfb_fbinfo_init(struct fb_info *info)
 	if (r != 0)
 		DISPERR("failed to mtkfb_set_par\n");
 
+	u32 *pal = (u32 *)info->pseudo_palette;
+	pal[0]  = 0x00000000; // black
+	pal[1]  = 0x00aa0000; // red
+	pal[2]  = 0x0000aa00; // green
+	pal[3]  = 0x00aa5500; // brown
+	pal[4]  = 0x000000aa; // blue
+	pal[5]  = 0x00aa00aa; // magenta
+	pal[6]  = 0x0000aaaa; // cyan
+	pal[7]  = 0x00aaaaaa; // light gray
+	pal[8]  = 0x00555555; // dark gray
+	pal[9]  = 0x00ff5555; // light red
+	pal[10] = 0x0055ff55; // light green
+	pal[11] = 0x00ffff55; // yellow
+	pal[12] = 0x005555ff; // light blue
+	pal[13] = 0x00ff55ff; // light magenta
+	pal[14] = 0x0055ffff; // light cyan
+	pal[15] = 0x00ffffff; // white
+	pr_info("pal0=%08x pal15=%08x visual=%u type=%u bpp=%u\n",
+        pal[0], pal[15], info->fix.visual, info->fix.type, info->var.bits_per_pixel);
 	MSG_FUNC_LEAVE();
 	return r;
 }

@@ -925,7 +925,7 @@ static int mtkfb_soft_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	NOT_REFERENCED(info);
 	NOT_REFERENCED(cursor);
 
-	return 0;
+	return -EINVAL;
 }
 
 static int mtkfb_get_overlay_layer_info(struct fb_overlay_layer_info *layerInfo)
