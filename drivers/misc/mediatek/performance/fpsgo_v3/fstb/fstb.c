@@ -31,6 +31,8 @@
 #define API_READY 0
 #if IS_ENABLED(CONFIG_MTK_GPU_SUPPORT)
 #include "ged_kpi.h"
+#else
+extern void ged_kpi_set_target_FPS_margin(u64 ulID, int target_FPS, int margin);
 #endif
 
 #define mtk_fstb_dprintk_always(fmt, args...) \
@@ -1435,8 +1437,8 @@ static void fstb_fps_stats(struct work_struct *work)
 				iter->target_fps_margin_dbnc_b,
 				"target_fps_margin_dbnc_b");
 
-			ged_kpi_set_target_FPS_margin(iter->bufid,
-			iter->target_fps, iter->target_fps_margin);
+			//ged_kpi_set_target_FPS_margin(iter->bufid,
+			//iter->target_fps, iter->target_fps_margin);
 
 			mtk_fstb_dprintk(
 			"%s pid:%d target_fps:%d\n",
@@ -2013,7 +2015,7 @@ int mtk_fstb_init(void)
 
 	num_cluster = arch_nr_clusters();
 
-	ged_kpi_output_gfx_info2_fp = gpu_time_update;
+	//ged_kpi_output_gfx_info2_fp = gpu_time_update;
 
 
 	if (!fpsgo_sysfs_create_dir(NULL, "fstb", &fstb_kobj)) {
